@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StudentMapper">
+    
+    <resultMap type="Student" id="StudentResult">
+        <result property="studentId"    column="student_id"    />
+        <result property="studentName"    column="student_name"    />
+        <result property="studentAge"    column="student_age"    />
+    </resultMap>
+	
+	<sql id="selectStudentVo">
+        select student_id, student_name, student_age from sys_student
+    </sql>
+	
+    <select id="selectStudentList" parameterType="Student" resultMap="StudentResult">
+        <include refid="selectStudentVo"/>
+        <where>  
+            <if test="studentId != null "> and student_id = #{studentId}</if>
+             <if test="studentName != null  and studentName != '' "> and student_name = #{studentName}</if>
+             <if test="studentAge != null "> and student_age = #{studentAge}</if>
+         </where>
+    </select>
+    
+    <select id="selectStudentById" parameterType="Integer" resultMap="StudentResult">
+        <include refid="selectStudentVo"/>
+        where student_id = #{studentId}
+    </select>
+        
+    <insert id="insertStudent" parameterType="Student" useGeneratedKeys="true" keyProperty="studentId">
+        insert into sys_student
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="studentName != null  and studentName != ''  ">student_name,</if>
+			<if test="studentAge != null  ">student_age,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="studentName != null  and studentName != ''  ">#{studentName},</if>
+			<if test="studentAge != null  ">#{studentAge},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateStudent" parameterType="Student">
+        update sys_student
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="studentName != null  and studentName != ''  ">student_name = #{studentName},</if>
+            <if test="studentAge != null  ">student_age = #{studentAge},</if>
+        </trim>
+        where student_id = #{studentId}
+    </update>
+
+	<delete id="deleteStudentById" parameterType="Integer">
+        delete from sys_student where student_id = #{studentId}
+    </delete>
+	
+    <delete id="deleteStudentByIds" parameterType="String">
+        delete from sys_student where student_id in 
+        <foreach item="studentId" collection="array" open="(" separator="," close=")">
+            #{studentId}
+        </foreach>
+    </delete>
+    
+</mapper>
